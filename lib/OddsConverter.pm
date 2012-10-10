@@ -1,5 +1,17 @@
 package OddsConverter;
 
+=head1 NAME
+
+OddsConverter
+
+=head1 SYNOPSIS
+
+    my $oc = OddsConverter->new(probability => 0.5);
+    print $oc->decimal_odds;    # '2.00' (always to 2 decimal places)
+    print $oc->roi;             # '100%' (always whole numbers or 'Inf.')
+
+=cut
+
 use Modern::Perl;
 use POSIX qw (ceil);
 
@@ -32,28 +44,18 @@ around BUILDARGS => sub {
 sub decimal_odds
 {
     my $self = shift;
-    my $odds;
 
-    if ( $self->probability == 0 ) {
-        $odds = 'Inf.';
-    } else {
-        $odds = sprintf("%0.2f", $self->calc_odds);
-    }
-
+    my $odds = ($self->probability == 0) ? 'Inf.' :
+                   sprintf("%0.2f", $self->calc_odds);
     return $odds;
 }
 
 sub roi
 {
     my $self = shift;
-    my $roi;
 
-    if ( $self->probability == 0 ) {
-        $roi = 'Inf.';
-    } else {
-        $roi = sprintf("%d%%", $self->calc_roi);
-    }
-
+    my $roi = ($self->probability == 0) ? 'Inf.' :
+                  sprintf("%d%%", $self->calc_roi);
     return $roi;
 }
 
@@ -68,17 +70,5 @@ sub calc_roi
     my $self = shift;
     return ceil(($self->calc_odds - 1) * 100) if ($self->probability != 0);
 }
-
-=head1 NAME
-
-OddsConverter
-
-=head1 SYNOPSIS
-
-    my $oc = OddsConverter->new(probability => 0.5);
-    print $oc->decimal_odds;    # '2.00' (always to 2 decimal places)
-    print $oc->roi;             # '100%' (always whole numbers or 'Inf.')
-
-=cut
 
 1;
